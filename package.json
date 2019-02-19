@@ -7,6 +7,7 @@
 	"description": "What am I about?",
 	"main": "server.js",
 	"scripts": {
+		"test": "./node_modules/mocha/bin/mocha --ui tdd tests",
 		"start": "node server.js"
 	},
 	"dependencies": {

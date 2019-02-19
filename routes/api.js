@@ -39,7 +39,7 @@ module.exports = function (app) {
       adaptResponse(res, board.getThreads(req.params.board), true)
     })
     .post((req, res) => {
-      adaptResponse(res, board.createThread(req.params.board, req.body.text, req.body.delete_password))
+      adaptResponse(res, board.createThread(req.params.board, req.body.text, req.body.delete_password), true)
     })
     .put((req, res) => {
       adaptResponse(res, board.reportThread(req.body.thread_id))
@@ -53,7 +53,7 @@ module.exports = function (app) {
       adaptResponse(res, board.getThreadWithMessages(req.query.thread_id), true)
     })
     .post((req, res) => {
-      adaptResponse(res, board.addMessage(req.body.thread_id, req.body.text, req.body.delete_password))
+      adaptResponse(res, board.addMessage(req.body.thread_id, req.body.text, req.body.delete_password), true)
     })
     .put((req, res) => {
       adaptResponse(res, board.reportMessage(req.body.reply_id))

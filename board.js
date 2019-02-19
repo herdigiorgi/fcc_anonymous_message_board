@@ -66,7 +66,12 @@ function countThreadMessages(threadId) {
 
 function createThread(board, text, password) {
     const thread = populateThread(board, text, password)
-    return Thread.create(thread)
+    return Thread.create(thread).then(created => {
+        return {
+            _id: created._id,
+            text: created.text
+        };
+    })
 }
 
 function reportThread(_id) {
@@ -133,6 +138,10 @@ function addMessage(threadId, text, password) {
         .then(thread => {
             if(!thread) throw NOT_FOUND;
             return Message.create(populateMessage(threadId, text, password))
+                .then(r => ({
+                    _id: r._id,
+                    text: r.text
+                }))
         })
 }
 
