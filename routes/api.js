@@ -59,7 +59,7 @@ module.exports = function (app) {
       adaptResponse(res, board.reportMessage(req.body.reply_id))
     })
     .delete((req, res) => {
-      adaptResponse(res, board.getThreads(req.params.reply_id, req.body.delete_password))
+      adaptResponse(res, board.deleteMessage(req.body.reply_id, req.body.delete_password))
     })
 
 };
