@@ -60,6 +60,10 @@ function populateThread(board, text, password) {
     }
 }
 
+function countThreadMessages(threadId) {
+    return Message.count({threadId}).exec()
+}
+
 function createThread(board, text, password) {
     const thread = populateThread(board, text, password)
     return Thread.create(thread)
@@ -102,6 +106,28 @@ function getMessages(threadId, limit) {
      .exec()
 }
 
+function getThreadWithMessages(threadId) {
+    const messagesProm = getMessages(threadId);
+    const threadProm = Thread.findById(threadId, "-passwordHash -reported -__v")
+        .exec().then(data => {
+            if (!data) throw NOT_FOUND;
+            return data;
+        })
+    return Promise.all([messagesProm, threadProm])
+        .then(([messages, thread]) => {
+            return {
+                ...(thread._doc),
+                messages
+            }
+        })
+}
+
+function getMessagesWithCount(threadId, limit) {
+    const messages = getMessages(threadId, limit);
+    const count = countThreadMessages(threadId);
+    return Promise.all([count, messages]);
+}
+
 function addMessage(threadId, text, password) {
     return Thread.findById(threadId).exec()
         .then(thread => {
@@ -129,13 +155,14 @@ function deleteMessage(messageId, password) {
 function getThreads(board, threadLimit = 10, replyLimit = 3) {
     return Thread.find({board}, "-passwordHash -reported -__v", {limit: threadLimit, sort: {bumpedOn: -1}}).exec()
         .then(threads => {
-            const messageProms = threads.map(t => getMessages(t._id, replyLimit))
-            return Promise.all(messageProms).then(messages => {
+            const msgWithCountProm = threads.map(t => getMessagesWithCount(t._id, replyLimit))
+            return Promise.all(msgWithCountProm).then(msgWithCount => {
                 var i=0;
                 return threads.map(thread => {
                     return {
                         ...(thread._doc),
-                        messages: messages[i++]
+                        messageCount: msgWithCount[i][0],
+                        messages: msgWithCount[i++][1]
                     }
                 })
             })
@@ -145,4 +172,5 @@ function getThreads(board, threadLimit = 10, replyLimit = 3) {
 module.exports = {
     getThreads, createThread, reportThread, deleteThread, 
     getMessages, addMessage, reportMessage, deleteMessage,
+    getThreadWithMessages,
     BAD_PASSWORD, NOT_FOUND }

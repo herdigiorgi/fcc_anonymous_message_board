@@ -50,7 +50,7 @@ module.exports = function (app) {
     
   app.route('/api/replies/:board')
     .get((req, res) => {
-      adaptResponse(res, board.getMessages(req.query.thread_id), true)
+      adaptResponse(res, board.getThreadWithMessages(req.query.thread_id), true)
     })
     .post((req, res) => {
       adaptResponse(res, board.addMessage(req.body.thread_id, req.body.text, req.body.delete_password))
