@@ -19,7 +19,8 @@ const ThreadSchema = new Schema({
     text: {type: String, required: true},
     createdOn: {type: Date, required: true},
     bumpedOn: {type: Date, required: true},
-    passwordHash: {type: String, required: true}
+    passwordHash: {type: String, required: true},
+    reported: {type: Boolean, required: false, default: false}
 })
 
 
@@ -55,6 +56,7 @@ function populateThread(board, text, password) {
         createdOn: new Date(),
         bumpedOn: new Date(),
         passwordHash: hash(password),
+        reported: false
     }
 }
 
@@ -64,7 +66,12 @@ function createThread(board, text, password) {
 }
 
 function reportThread(_id) {
+    console.log(_id)
     return Thread.findByIdAndUpdate(_id, {reported: true}).exec()
+        .then(x => {
+            if(!x) throw NOT_FOUND;
+            return x;
+        })
 }
 
 function hardDeleteThread(_id) {
@@ -104,7 +111,11 @@ function addMessage(threadId, text, password) {
 }
 
 function reportMessage(messageId) {
-    return Message.findByIdAndUpdate(messageId, {reported: true}).exec();
+    return Message.findByIdAndUpdate(messageId, {reported: true}).exec()
+        .then(x => {
+            if(!x) throw NOT_FOUND;
+            return x;
+        })
 }
 
 function deleteMessage(messageId, password) {

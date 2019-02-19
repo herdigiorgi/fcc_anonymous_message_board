@@ -20,7 +20,7 @@ function adaptResponse(res, resultPromise, json=false) {
   }).catch(error => {
       switch(error) {
         case board.NOT_FOUND:
-          res.status(500).send('not found')
+          res.status(404).send('not found')
           break;
         case board.BAD_PASSWORD:
           res.status(400).send('incorrect password')
@@ -42,7 +42,7 @@ module.exports = function (app) {
       adaptResponse(res, board.createThread(req.params.board, req.body.text, req.body.delete_password))
     })
     .put((req, res) => {
-      adaptResponse(res, board.reportMessage(req.body.thread_id))
+      adaptResponse(res, board.reportThread(req.body.thread_id))
     })
     .delete((req, res) => {
       adaptResponse(res, board.deleteThread(req.body.thread_id, req.body.delete_password))
@@ -56,7 +56,7 @@ module.exports = function (app) {
       adaptResponse(res, board.addMessage(req.body.thread_id, req.body.text, req.body.delete_password))
     })
     .put((req, res) => {
-      adaptResponse(res, board.reportMessage(req.params.reply_id))
+      adaptResponse(res, board.reportMessage(req.body.reply_id))
     })
     .delete((req, res) => {
       adaptResponse(res, board.getThreads(req.params.reply_id, req.body.delete_password))
